@@ -70,8 +70,8 @@ function Home() {
   }
 
   const statistics = [
-    { number: "21", label: "Casos en 2024", sublabel: "Niñas 10-14 años" },
     { number: "17", label: "Casos en 2023", sublabel: "Niñas 10-14 años" },
+    { number: "21", label: "Casos en 2024", sublabel: "Niñas 10-14 años" },
     { number: "+23%", label: "Incremento", sublabel: "2023-2024" }
   ]
 
