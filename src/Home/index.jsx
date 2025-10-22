@@ -233,10 +233,10 @@ function Home() {
           <div className="definition-box">
             <h3>📘 Definición UNESCO y OMS</h3>
             <p>
-              La sexualidad es una <strong>dimensión central y multidimensional</strong> del ser
-              humano. Abarca aspectos biológicos, psicológicos, sociales, afectivos y culturales,
-              e incluye la identidad de género, la orientación sexual, las relaciones íntimas,
-              el placer y la reproducción.
+              La UNESCO y la OMS definen la sexualidad como una dimensión central y multidimensional del ser
+humano. La sexualidad abarca aspectos biológicos, psicológicos, sociales, afectivos y culturales, e
+incluye la identidad de género, la orientación sexual, las relaciones íntimas, el placer y la
+reproducción. 
             </p>
             <p className="definition-note">
               Es una experiencia compleja que se expresa en pensamientos, sentimientos,
