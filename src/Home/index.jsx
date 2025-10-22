@@ -269,7 +269,7 @@ reproducción. 
             <div className="objective-card">
               <span className="objective-icon">🛡️</span>
               <h4>Prevención</h4>
-              <p>Prevenir embarazos no deseados y enfermedades de transmisión sexual</p>
+              <p>Prevenir embarazos no deseados y violencias</p>
             </div>
           </div>
         </div>
