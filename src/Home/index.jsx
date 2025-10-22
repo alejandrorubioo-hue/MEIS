@@ -207,23 +207,25 @@ function Home() {
         </div>
       </section>
 
-      {/* VIDEO EDUCATIVO */}
-      <section className="video-section">
-        <div className="video-content">
-          <h2>Material Educativo</h2>
-          <p>Comprende mejor la importancia de la Educación Integral en Sexualidad</p>
+    {/* VIDEO EDUCATIVO */}
+<section className="video-section">
+  <div className="video-content">
+    <h2>Diagnóstico Territorial</h2>
+    <p>Análisis de la situación actual y la necesidad de intervención educativa</p>
 
-          <div className="video-wrapper">
-            <iframe
-              src="https://www.youtube.com/embed/rFGHDKk2VEA"
-              title="Video Educativo EIS"
-              frameBorder="0"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-            ></iframe>
-          </div>
-        </div>
-      </section>
+    <div className="video-wrapper">
+      <iframe
+        width="100%"
+        height="100%"
+        src="https://www.youtube.com/embed/rFGHDKk2VEA"
+        title="Contexto Manual EIS"
+        frameBorder="0"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+        allowFullScreen
+      ></iframe>
+    </div>
+  </div>
+</section>
 
       {/* DEFINICIÓN UNESCO/OMS */}
       <section className="definition-section">
