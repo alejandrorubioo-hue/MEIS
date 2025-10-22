@@ -461,10 +461,11 @@
 .objectives-section {
   padding: 4rem 2rem;
   background: white;
+  overflow-x: auto; /* Permite scroll horizontal en móviles */
 }
 
 .objectives-content {
-  max-width: 1100px;
+  max-width: 1400px; /* Aumentado para dar más espacio */
   margin: 0 auto;
 }
 
@@ -477,17 +478,19 @@
 
 .objectives-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 2rem;
+  grid-template-columns: repeat(5, 1fr); /* Exactamente 5 columnas */
+  gap: 1.5rem;
+  min-width: 1100px; /* Ancho mínimo para mantener las 5 columnas */
 }
 
 .objective-card {
   background: linear-gradient(135deg, #f6f9fc 0%, #ffffff 100%);
-  padding: 2rem;
+  padding: 1.5rem;
   border-radius: 12px;
   border: 1px solid #e9ecef;
   text-align: center;
   transition: all 0.3s ease;
+  min-width: 200px; /* Ancho mínimo por tarjeta */
 }
 
 .objective-card:hover {
@@ -496,21 +499,73 @@
 }
 
 .objective-icon {
-  font-size: 2.5rem;
+  font-size: 2rem; /* Reducido ligeramente */
   display: block;
-  margin-bottom: 1rem;
+  margin-bottom: 0.8rem;
 }
 
 .objective-card h4 {
   color: #2c3e50;
   margin-bottom: 0.5rem;
-  font-size: 1.1rem;
+  font-size: 1rem; /* Reducido ligeramente */
 }
 
 .objective-card p {
   color: #5a6c7d;
-  line-height: 1.6;
-  font-size: 0.95rem;
+  line-height: 1.5;
+  font-size: 0.9rem; /* Reducido ligeramente */
+}
+
+/* ========================================
+   RESPONSIVE PARA OBJETIVOS
+======================================== */
+@media (max-width: 1200px) {
+  .objectives-section {
+    overflow-x: scroll;
+    padding: 4rem 1rem;
+  }
+
+  .objectives-grid {
+    padding-bottom: 1rem;
+  }
+
+  /* Indicador de scroll en móviles */
+  .objectives-section::-webkit-scrollbar {
+    height: 6px;
+  }
+
+  .objectives-section::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+  }
+
+  .objectives-section::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 10px;
+  }
+}
+
+@media (max-width: 768px) {
+  .objectives-content h2 {
+    font-size: 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .objective-card {
+    padding: 1.2rem;
+  }
+
+  .objective-icon {
+    font-size: 1.8rem;
+  }
+
+  .objective-card h4 {
+    font-size: 0.95rem;
+  }
+
+  .objective-card p {
+    font-size: 0.85rem;
+  }
 }
 
 /* ========================================

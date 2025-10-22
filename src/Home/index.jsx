@@ -247,33 +247,39 @@ reproducción. 
       </section>
 
       {/* OBJETIVOS DEL MANUAL */}
-      <section className="objectives-section">
-        <div className="objectives-content">
-          <h2>Objetivos del Manual</h2>
-          <div className="objectives-grid">
-            <div className="objective-card">
-              <span className="objective-icon">🤝</span>
-              <h4>Relaciones Respetuosas</h4>
-              <p>Fomentar el desarrollo de relaciones sociales y sexuales basadas en el respeto mutuo</p>
-            </div>
-            <div className="objective-card">
-              <span className="objective-icon">💡</span>
-              <h4>Decisiones Informadas</h4>
-              <p>Promover la toma de decisiones informadas y responsables</p>
-            </div>
-            <div className="objective-card">
-              <span className="objective-icon">⚖️</span>
-              <h4>Derechos Sexuales</h4>
-              <p>Garantizar el ejercicio de los derechos sexuales y reproductivos</p>
-            </div>
-            <div className="objective-card">
-              <span className="objective-icon">🛡️</span>
-              <h4>Prevención</h4>
-              <p>Prevenir embarazos no deseados y violencias</p>
-            </div>
-          </div>
-        </div>
-      </section>
+<section className="objectives-section">
+  <div className="objectives-content">
+    <h2>Objetivos del Manual</h2>
+    <div className="objectives-grid">
+      <div className="objective-card">
+        <span className="objective-icon">🤝</span>
+        <h4>Relaciones Respetuosas</h4>
+        <p>Fomentar el desarrollo de relaciones sociales y sexuales basadas en el respeto mutuo</p>
+      </div>
+      <div className="objective-card">
+        <span className="objective-icon">💡</span>
+        <h4>Decisiones Informadas</h4>
+        <p>Promover la toma de decisiones informadas y responsables</p>
+      </div>
+      <div className="objective-card">
+        <span className="objective-icon">⚖️</span>
+        <h4>Derechos Sexuales</h4>
+        <p>Garantizar el ejercicio de los derechos sexuales y reproductivos</p>
+      </div>
+      <div className="objective-card">
+        <span className="objective-icon">🛡️</span>
+        <h4>Prevención</h4>
+        <p>Prevenir embarazos no deseados y enfermedades de transmisión sexual</p>
+      </div>
+      {/* NUEVO OBJETIVO */}
+      <div className="objective-card">
+        <span className="objective-icon">🔍</span>
+        <h4>Deconstrucción de Mitos</h4>
+        <p>Identificar y cuestionar creencias limitantes para construir una comprensión saludable de la sexualidad</p>
+      </div>
+    </div>
+  </div>
+</section>
 
       {/* CALL TO ACTION */}
       <section className="cta-section">
