@@ -1,4 +1,5 @@
 // Detalle/index.jsx - Página completa de detalles del personaje
+// Te amo  amor besitos y para bebe tambien
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import './style.css'
