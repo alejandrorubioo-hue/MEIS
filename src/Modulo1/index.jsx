@@ -3,6 +3,11 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import './style.css'
 
+// Importar las imágenes de siluetas (las agregarás después)
+import siluetaFemenina from './images/silueta-femenina.png'
+import siluetaMasculina from './images/silueta-masculina.png'
+import siluetaNeutral from './images/silueta-neutral.png'
+
 function Modulo1() {
   const navigate = useNavigate()
   const [activeStep, setActiveStep] = useState(0)
@@ -33,17 +38,35 @@ function Modulo1() {
     { id: 'neutral', color: '#BDC3C7', name: 'Neutral', description: 'Sin emoción específica' }
   ]
 
-  // Zonas del cuerpo para la cartografía
+  // Zonas del cuerpo para la cartografía - CON POSICIONES PARA MAPEAR
   const bodyZones = [
-    { id: 'cabeza', name: 'Cabeza', description: 'Pensamientos, ideas, sueños', icon: '🧠' },
-    { id: 'ojos', name: 'Ojos', description: 'Perspectiva, observación, visión', icon: '👁️' },
-    { id: 'boca', name: 'Boca', description: 'Comunicación, expresión, voz', icon: '👄' },
-    { id: 'corazon', name: 'Corazón', description: 'Emociones, sentimientos, afectos', icon: '❤️' },
-    { id: 'manos', name: 'Manos', description: 'Acciones, creación, contacto', icon: '🤲' },
-    { id: 'estomago', name: 'Estómago', description: 'Intuición, sensaciones, nervios', icon: '🌟' },
-    { id: 'pies', name: 'Pies', description: 'Camino, dirección, estabilidad', icon: '👣' },
-    { id: 'espalda', name: 'Espalda', description: 'Cargas, responsabilidades, apoyo', icon: '💪' }
+    { id: 'cabeza', name: 'Cabeza', description: 'Pensamientos, ideas, sueños', icon: '🧠', top: '5%', left: '47%', width: '6%', height: '8%' },
+    { id: 'ojos', name: 'Ojos', description: 'Perspectiva, observación, visión', icon: '👁️', top: '8%', left: '47%', width: '6%', height: '3%' },
+    { id: 'boca', name: 'Boca', description: 'Comunicación, expresión, voz', icon: '👄', top: '11%', left: '48%', width: '4%', height: '2%' },
+    { id: 'cuello', name: 'Cuello', description: 'Conexión mente-cuerpo', icon: '🔗', top: '14%', left: '48%', width: '4%', height: '3%' },
+    { id: 'hombros', name: 'Hombros', description: 'Responsabilidades, cargas', icon: '💪', top: '17%', left: '40%', width: '20%', height: '4%' },
+    { id: 'corazon', name: 'Corazón', description: 'Emociones, sentimientos', icon: '❤️', top: '22%', left: '45%', width: '10%', height: '8%' },
+    { id: 'brazo_izq', name: 'Brazo Izq.', description: 'Acción, abrazo', icon: '💪', top: '22%', left: '32%', width: '6%', height: '15%' },
+    { id: 'brazo_der', name: 'Brazo Der.', description: 'Acción, abrazo', icon: '💪', top: '22%', left: '62%', width: '6%', height: '15%' },
+    { id: 'manos', name: 'Manos', description: 'Creación, contacto', icon: '🤲', top: '38%', left: '30%', width: '40%', height: '4%' },
+    { id: 'estomago', name: 'Estómago', description: 'Intuición, nervios', icon: '🌟', top: '30%', left: '45%', width: '10%', height: '8%' },
+    { id: 'espalda', name: 'Espalda', description: 'Apoyo, historia', icon: '🛡️', top: '20%', left: '47%', width: '6%', height: '15%' },
+    { id: 'pelvis', name: 'Pelvis', description: 'Sexualidad, creatividad', icon: '🔥', top: '38%', left: '44%', width: '12%', height: '8%' },
+    { id: 'genitales', name: 'Zona íntima', description: 'Intimidad, placer', icon: '🌸', top: '45%', left: '47%', width: '6%', height: '5%' },
+    { id: 'muslo_izq', name: 'Muslo Izq.', description: 'Fuerza, movimiento', icon: '🦵', top: '50%', left: '42%', width: '7%', height: '12%' },
+    { id: 'muslo_der', name: 'Muslo Der.', description: 'Fuerza, movimiento', icon: '🦵', top: '50%', left: '51%', width: '7%', height: '12%' },
+    { id: 'rodillas', name: 'Rodillas', description: 'Flexibilidad, humildad', icon: '🔄', top: '62%', left: '43%', width: '14%', height: '5%' },
+    { id: 'pierna_izq', name: 'Pierna Izq.', description: 'Avance, dirección', icon: '🚶', top: '67%', left: '42%', width: '6%', height: '15%' },
+    { id: 'pierna_der', name: 'Pierna Der.', description: 'Avance, dirección', icon: '🚶', top: '67%', left: '52%', width: '6%', height: '15%' },
+    { id: 'pies', name: 'Pies', description: 'Camino, conexión con la tierra', icon: '👣', top: '82%', left: '41%', width: '18%', height: '6%' }
   ]
+
+  // Mapa de siluetas según género
+  const silhouettes = {
+    femenino: siluetaFemenina,
+    masculino: siluetaMasculina,
+    neutral: siluetaNeutral
+  }
 
   // Pasos del proceso
   const steps = [
@@ -80,6 +103,7 @@ function Modulo1() {
     }
     localStorage.setItem('modulo1_cartografia', JSON.stringify(data))
     setShowResults(true)
+    setActiveStep(4)
   }
 
   // Asignar emoción a zona
@@ -90,64 +114,14 @@ function Modulo1() {
     })
   }
 
-  // Componente de Silueta Interactiva
-  const InteractiveSilhouette = () => (
-    <div className="silhouette-container">
-      <div className="silhouette-wrapper">
-        <svg viewBox="0 0 200 400" className="body-silhouette">
-          {/* Silueta básica */}
-          <path
-            d="M100,40 C100,20 100,20 100,40 C120,40 130,50 130,70 L130,150 L150,120 L160,130 L140,170 L140,250 L160,350 L140,360 L110,260 L100,280 L90,260 L60,360 L40,350 L60,250 L60,170 L40,130 L50,120 L70,150 L70,70 C70,50 80,40 100,40 Z"
-            fill="#f0f0f0"
-            stroke="#333"
-            strokeWidth="2"
-          />
-
-          {/* Zonas interactivas */}
-          <circle
-            cx="100" cy="40" r="25"
-            className={`body-zone ${emotions.cabeza ? 'active' : ''}`}
-            data-zone="cabeza"
-            onClick={() => setSelectedZone('cabeza')}
-            fill={emotions.cabeza ? emotionalColors.find(e => e.id === emotions.cabeza)?.color : 'transparent'}
-            fillOpacity="0.6"
-          />
-          <circle
-            cx="100" cy="100" r="20"
-            className={`body-zone ${emotions.corazon ? 'active' : ''}`}
-            data-zone="corazon"
-            onClick={() => setSelectedZone('corazon')}
-            fill={emotions.corazon ? emotionalColors.find(e => e.id === emotions.corazon)?.color : 'transparent'}
-            fillOpacity="0.6"
-          />
-          <circle
-            cx="100" cy="150" r="20"
-            className={`body-zone ${emotions.estomago ? 'active' : ''}`}
-            data-zone="estomago"
-            onClick={() => setSelectedZone('estomago')}
-            fill={emotions.estomago ? emotionalColors.find(e => e.id === emotions.estomago)?.color : 'transparent'}
-            fillOpacity="0.6"
-          />
-          <circle
-            cx="150" cy="140" r="15"
-            className={`body-zone ${emotions.manos ? 'active' : ''}`}
-            data-zone="manos"
-            onClick={() => setSelectedZone('manos')}
-            fill={emotions.manos ? emotionalColors.find(e => e.id === emotions.manos)?.color : 'transparent'}
-            fillOpacity="0.6"
-          />
-          <circle
-            cx="50" cy="140" r="15"
-            className={`body-zone ${emotions.manos ? 'active' : ''}`}
-            data-zone="manos"
-            onClick={() => setSelectedZone('manos')}
-            fill={emotions.manos ? emotionalColors.find(e => e.id === emotions.manos)?.color : 'transparent'}
-            fillOpacity="0.6"
-          />
-        </svg>
-
-        {/* Etiquetas de zonas */}
-        <div className="zone-labels">
+  // Componente de Silueta Interactiva CORREGIDO
+const InteractiveSilhouette = () => (
+  <div className="silhouette-container">
+    <div className="silhouette-main-content">
+      {/* COLUMNA IZQUIERDA: Lista de zonas */}
+      <div className="zones-sidebar">
+        <h3>Zonas del cuerpo:</h3>
+        <div className="zones-list">
           {bodyZones.map(zone => (
             <button
               key={zone.id}
@@ -157,41 +131,63 @@ function Modulo1() {
               <span className="zone-icon">{zone.icon}</span>
               <span className="zone-name">{zone.name}</span>
               {emotions[zone.id] && (
-                <span className="zone-emotion" style={{
-                  backgroundColor: emotionalColors.find(e => e.id === emotions[zone.id])?.color
-                }}></span>
+                <span
+                  className="zone-emotion-dot"
+                  style={{
+                    backgroundColor: emotionalColors.find(e => e.id === emotions[zone.id])?.color
+                  }}
+                />
               )}
             </button>
           ))}
         </div>
       </div>
 
-      {/* Panel de emociones */}
-      {selectedZone && (
-        <div className="emotion-panel">
-          <h3>
-            Asignar emoción a: {bodyZones.find(z => z.id === selectedZone)?.name}
-          </h3>
-          <p className="zone-description">
-            {bodyZones.find(z => z.id === selectedZone)?.description}
-          </p>
-          <div className="emotion-grid">
-            {emotionalColors.map(emotion => (
-              <button
-                key={emotion.id}
-                className={`emotion-button ${emotions[selectedZone] === emotion.id ? 'selected' : ''}`}
-                onClick={() => assignEmotion(selectedZone, emotion.id)}
-                style={{ backgroundColor: emotion.color }}
-              >
-                <span className="emotion-name">{emotion.name}</span>
-                <span className="emotion-description">{emotion.description}</span>
-              </button>
-            ))}
+      {/* COLUMNA CENTRAL: Silueta */}
+      <div className="body-image-wrapper">
+        <img
+          src={silhouettes[selectedGender]}
+          alt={`Silueta ${selectedGender}`}
+          className="body-silhouette-image"
+        />
+      </div>
+
+      {/* COLUMNA DERECHA: Panel de emociones */}
+      <div className="emotion-sidebar">
+        {selectedZone ? (
+          <>
+            <h3>Asignar emoción a: {bodyZones.find(z => z.id === selectedZone)?.name}</h3>
+            <p className="zone-description">
+              {bodyZones.find(z => z.id === selectedZone)?.description}
+            </p>
+            <div className="emotion-list">
+              {emotionalColors.map(emotion => (
+                <button
+                  key={emotion.id}
+                  className={`emotion-button ${emotions[selectedZone] === emotion.id ? 'selected' : ''}`}
+                  onClick={() => assignEmotion(selectedZone, emotion.id)}
+                >
+                  <div
+                    className="emotion-color-badge"
+                    style={{ backgroundColor: emotion.color }}
+                  />
+                  <div className="emotion-info">
+                    <span className="emotion-name">{emotion.name}</span>
+                    <span className="emotion-description">{emotion.description}</span>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </>
+        ) : (
+          <div className="emotion-placeholder">
+            <p>👈 Selecciona una zona del cuerpo para asignarle una emoción</p>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
-  )
+  </div>
+)
 
   // Renderizado principal
   return (
@@ -293,21 +289,39 @@ function Modulo1() {
                 className={`gender-option ${selectedGender === 'femenino' ? 'selected' : ''}`}
                 onClick={() => setSelectedGender('femenino')}
               >
-                <span className="gender-icon">👩</span>
+                <div className="gender-preview">
+                  <img
+                    src={silhouettes.femenino}
+                    alt="Silueta femenina"
+                    className="gender-thumbnail"
+                  />
+                </div>
                 <span>Silueta Femenina</span>
               </button>
               <button
                 className={`gender-option ${selectedGender === 'masculino' ? 'selected' : ''}`}
                 onClick={() => setSelectedGender('masculino')}
               >
-                <span className="gender-icon">👨</span>
+                <div className="gender-preview">
+                  <img
+                    src={silhouettes.masculino}
+                    alt="Silueta masculina"
+                    className="gender-thumbnail"
+                  />
+                </div>
                 <span>Silueta Masculina</span>
               </button>
               <button
                 className={`gender-option ${selectedGender === 'neutral' ? 'selected' : ''}`}
                 onClick={() => setSelectedGender('neutral')}
               >
-                <span className="gender-icon">👤</span>
+                <div className="gender-preview">
+                  <img
+                    src={silhouettes.neutral}
+                    alt="Silueta neutral"
+                    className="gender-thumbnail"
+                  />
+                </div>
                 <span>Silueta Neutral</span>
               </button>
             </div>
@@ -440,7 +454,7 @@ function Modulo1() {
         )}
 
         {/* Paso 4: Resultados */}
-        {activeStep === 4 || showResults && (
+        {(activeStep === 4 || showResults) && (
           <div className="step-content results">
             <div className="results-card">
               <h2>✨ Tu Cartografía Personal</h2>
