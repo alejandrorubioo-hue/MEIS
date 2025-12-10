@@ -4,8 +4,7 @@ import './App.css'
 
 // Páginas principales
 import Home from './Home'
-// Temporalmente comentados hasta que los crees
-// import Modulo1 from './Modulo1'
+import Modulo1 from './Modulo1'
 // import Modulo2 from './Modulo2'
 // import Modulo3 from './Modulo3'
 // import Modulo4 from './Modulo4'
@@ -21,9 +20,11 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/home" element={<Home />} />
 
-        {/* Rutas de módulos - descomenta cuando crees los componentes */}
-        {/* <Route path="/modulo1" element={<Modulo1 />} />
-        <Route path="/modulo2" element={<Modulo2 />} />
+        {/* Ruta del Módulo 1 - ACTIVA */}
+        <Route path="/modulo1" element={<Modulo1 />} />
+
+        {/* Rutas de módulos pendientes - descomenta cuando crees los componentes */}
+        {/* <Route path="/modulo2" element={<Modulo2 />} />
         <Route path="/modulo3" element={<Modulo3 />} />
         <Route path="/modulo4" element={<Modulo4 />} />
         <Route path="/modulo5" element={<Modulo5 />} />
