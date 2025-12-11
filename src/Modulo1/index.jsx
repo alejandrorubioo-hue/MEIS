@@ -682,23 +682,23 @@ const handleBodyPartClick = (zoneId) => {
                       <p className="question-text">{q.text}</p>
 
                       {/* Respuestas de texto normal */}
-                      {q.type === 'text' && responses[q.id] && (
-                        <p className="response-text">
-                          ✓ Respondida: {responses[q.id].substring(0, 100)}...
-                        </p>
-                      )}
+                      {responses[q.id] && (
+  <p className="response-text">
+    💭 {responses[q.id]}
+  </p>
+)}
 
                       {/* Respuestas split (niñas/niños) */}
                       {q.type === 'text-split' && (
                         <>
                           {responses[`${q.id}_girls`] && (
-                            <p className="response-text">
-                              👧 Niñas: {responses[`${q.id}_girls`].substring(0, 50)}...
-                            </p>
-                          )}
+  <p className="response-text">
+    👧 Niñas: {responses[`${q.id}_girls`]}
+  </p>
+)}
                           {responses[`${q.id}_boys`] && (
                             <p className="response-text">
-                              👦 Niños: {responses[`${q.id}_boys`].substring(0, 50)}...
+                              👦 Niños: {responses[`${q.id}_boys`]}
                             </p>
                           )}
                         </>
@@ -755,20 +755,20 @@ const handleBodyPartClick = (zoneId) => {
                       )}
 
                       {/* Cuerpo con texto */}
-                      {q.type === 'body-text' && (
-                        <>
-                          {bodySelections[q.id] && (
-                            <p className="response-text">
-                              ✓ {q.marker} Zona: {bodyZones.find(z => z.id === bodySelections[q.id])?.name}
-                            </p>
-                          )}
-                          {responses[q.id] && (
-                            <p className="response-text">
-                              💭 {responses[q.id].substring(0, 100)}...
-                            </p>
-                          )}
-                        </>
-                      )}
+{q.type === 'body-text' && (
+  <>
+    {bodySelections[q.id] && (
+      <p className="response-text">
+        ✓ {q.marker} Zona: {bodyZones.find(z => z.id === bodySelections[q.id].zone)?.name}
+      </p>
+    )}
+    {responses[q.id] && (
+  <p className="response-text">
+    ✓ Respondida: {responses[q.id]}
+  </p>
+)}
+  </>
+)}
                     </div>
                   ))}
                 </div>

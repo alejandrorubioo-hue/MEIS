@@ -792,3 +792,191 @@ button:disabled {
   color: var(--text-primary);
   font-weight: 600;
 }
+/* ==================== ESTILOS DE IMPRESIÓN ==================== */
+@media print {
+  /* Configuración general de página */
+  @page {
+    size: A4;
+    margin: 1cm;
+  }
+
+  /* Ocultar elementos innecesarios */
+  .modulo-header,
+  .navigation-buttons,
+  .results-actions,
+  .btn-primary,
+  .btn-secondary,
+  .btn-back {
+    display: none !important;
+  }
+
+  /* Ajustar el contenedor principal */
+  .modulo-container {
+    width: 100%;
+    max-width: 100%;
+    padding: 0;
+    margin: 0;
+  }
+
+  .results-screen {
+    padding: 0;
+    margin: 0;
+  }
+
+  /* Título del resumen */
+  .results-header {
+    text-align: center;
+    padding: 10px 0;
+    margin-bottom: 20px;
+    page-break-after: avoid;
+  }
+
+  .results-header h1 {
+    font-size: 24px;
+    color: #333;
+    margin-bottom: 5px;
+  }
+
+  .results-header p {
+    font-size: 14px;
+    color: #666;
+  }
+
+  /* Grid de componentes en 2 columnas */
+  .results-summary {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    page-break-inside: avoid;
+  }
+
+  /* Cada componente */
+  .component-summary {
+    break-inside: avoid;
+    page-break-inside: avoid;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    background: white;
+  }
+
+  /* Forzar componentes específicos a mantenerse juntos */
+  .component-summary:nth-child(1),
+  .component-summary:nth-child(2) {
+    page-break-after: avoid;
+  }
+
+  /* Si hay 5 componentes, el último ocupa ancho completo */
+  .component-summary:nth-child(5):last-child {
+    grid-column: 1 / -1;
+    max-width: 50%;
+    margin: 0 auto;
+  }
+
+  /* Header de cada componente */
+  .component-header {
+    padding: 8px !important;
+    margin: 0 !important;
+    border-radius: 6px 6px 0 0 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color: white !important;
+    page-break-after: avoid;
+  }
+
+  .component-header h3 {
+    font-size: 14px !important;
+    margin: 0 !important;
+    color: white !important;
+  }
+
+  /* Cuerpo del componente */
+  .component-body {
+    padding: 10px;
+  }
+
+  /* Items del resumen */
+  .summary-item {
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #f0f0f0;
+    page-break-inside: avoid;
+  }
+
+  .summary-item:last-child {
+    border-bottom: none;
+  }
+
+  /* Texto de preguntas y respuestas */
+  .question-text {
+    font-size: 11px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 5px;
+    line-height: 1.3;
+  }
+
+  .response-text {
+    font-size: 10px;
+    color: #555;
+    margin: 3px 0;
+    line-height: 1.4;
+    padding-left: 10px;
+  }
+
+  /* Mantener colores de fondo */
+  .component-summary[style*="borderColor"] {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Asegurar que los emojis se vean */
+  .response-text::before {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Reducir espaciado general */
+  * {
+    line-height: 1.2;
+  }
+
+  /* Control de saltos de página */
+  h1, h2, h3, h4, h5, h6 {
+    page-break-after: avoid;
+  }
+
+  p {
+    orphans: 3;
+    widows: 3;
+  }
+
+  /* Ajustes para respuestas largas */
+  .response-text {
+    word-wrap: break-word;
+    word-break: break-word;
+    hyphens: auto;
+  }
+
+  /* Si el contenido es muy largo, reducir más el tamaño */
+  @page {
+    size: A4 portrait;
+  }
+
+  /* Opción: Si quieres que cada componente empiece en nueva página */
+  /* .component-summary {
+    page-break-before: always;
+  } */
+
+  /* Primera página sin salto */
+  /* .component-summary:first-child {
+    page-break-before: avoid;
+  } */
+}
+
+/* Estilos adicionales para vista previa de impresión */
+@media screen and (max-width: 800px) {
+  .results-summary {
+    grid-template-columns: 1fr;
+  }
+}
