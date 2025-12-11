@@ -1,533 +1,800 @@
-// Modulo1/index.jsx - Cartografía Corporal Interactiva
-import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
-import './style.css'
+  // Modulo1/index.jsx - Cartografía Corporal Rediseñada con 3 columnas
+  import { useState, useEffect, useRef } from 'react'
+  import { useNavigate } from 'react-router-dom'
+  import './style.css'
 
-// Importar las imágenes de siluetas (las agregarás después)
-import siluetaFemenina from './images/silueta-femenina.png'
-import siluetaMasculina from './images/silueta-masculina.png'
-import siluetaNeutral from './images/silueta-neutral.png'
+  // Importar las imágenes de siluetas
+  import siluetaFemenina from './images/silueta-femenina.png'
+  import siluetaMasculina from './images/silueta-masculina.png'
+  
 
-function Modulo1() {
-  const navigate = useNavigate()
-  const [activeStep, setActiveStep] = useState(0)
-  const [selectedZone, setSelectedZone] = useState(null)
-  const [emotions, setEmotions] = useState({})
-  const [reflections, setReflections] = useState({
-    fortalezas: '',
-    vulnerabilidades: '',
-    limites: '',
-    placeres: '',
-    miedos: ''
-  })
-  const [showResults, setShowResults] = useState(false)
-  const [progress, setProgress] = useState(0)
-  const [selectedGender, setSelectedGender] = useState('neutral')
-  const [savedData, setSavedData] = useState(null)
-  const [showTooltip, setShowTooltip] = useState(true)
+  function Modulo1() {
+    const navigate = useNavigate()
+    const [currentStep, setCurrentStep] = useState('intro')
+    const [selectedGender, setSelectedGender] = useState('femenino')
+    const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
+    const [responses, setResponses] = useState({})
+    const [bodySelections, setBodySelections] = useState({})
+    const [showResults, setShowResults] = useState(false)
 
-  // Colores emocionales con significados
-  const emotionalColors = [
-    { id: 'alegria', color: '#FFD93D', name: 'Alegría', description: 'Felicidad, gozo, satisfacción' },
-    { id: 'amor', color: '#FF6B9D', name: 'Amor', description: 'Afecto, ternura, conexión' },
-    { id: 'confianza', color: '#4ECDC4', name: 'Confianza', description: 'Seguridad, tranquilidad' },
-    { id: 'miedo', color: '#95A5A6', name: 'Miedo', description: 'Temor, inseguridad, preocupación' },
-    { id: 'poder', color: '#9B59B6', name: 'Poder', description: 'Fortaleza, autonomía, control' },
-    { id: 'tristeza', color: '#3498DB', name: 'Tristeza', description: 'Melancolía, nostalgia' },
-    { id: 'verguenza', color: '#E74C3C', name: 'Vergüenza', description: 'Pudor, incomodidad' },
-    { id: 'neutral', color: '#BDC3C7', name: 'Neutral', description: 'Sin emoción específica' }
-  ]
+    // Referencias para evitar pérdida de foco
+    const textAreaRefs = useRef({})
 
-  // Zonas del cuerpo para la cartografía - CON POSICIONES PARA MAPEAR
-  const bodyZones = [
-    { id: 'cabeza', name: 'Cabeza', description: 'Pensamientos, ideas, sueños', icon: '🧠', top: '5%', left: '47%', width: '6%', height: '8%' },
-    { id: 'ojos', name: 'Ojos', description: 'Perspectiva, observación, visión', icon: '👁️', top: '8%', left: '47%', width: '6%', height: '3%' },
-    { id: 'boca', name: 'Boca', description: 'Comunicación, expresión, voz', icon: '👄', top: '11%', left: '48%', width: '4%', height: '2%' },
-    { id: 'cuello', name: 'Cuello', description: 'Conexión mente-cuerpo', icon: '🔗', top: '14%', left: '48%', width: '4%', height: '3%' },
-    { id: 'hombros', name: 'Hombros', description: 'Responsabilidades, cargas', icon: '💪', top: '17%', left: '40%', width: '20%', height: '4%' },
-    { id: 'corazon', name: 'Corazón', description: 'Emociones, sentimientos', icon: '❤️', top: '22%', left: '45%', width: '10%', height: '8%' },
-    { id: 'brazo_izq', name: 'Brazo Izq.', description: 'Acción, abrazo', icon: '💪', top: '22%', left: '32%', width: '6%', height: '15%' },
-    { id: 'brazo_der', name: 'Brazo Der.', description: 'Acción, abrazo', icon: '💪', top: '22%', left: '62%', width: '6%', height: '15%' },
-    { id: 'manos', name: 'Manos', description: 'Creación, contacto', icon: '🤲', top: '38%', left: '30%', width: '40%', height: '4%' },
-    { id: 'estomago', name: 'Estómago', description: 'Intuición, nervios', icon: '🌟', top: '30%', left: '45%', width: '10%', height: '8%' },
-    { id: 'espalda', name: 'Espalda', description: 'Apoyo, historia', icon: '🛡️', top: '20%', left: '47%', width: '6%', height: '15%' },
-    { id: 'pelvis', name: 'Pelvis', description: 'Sexualidad, creatividad', icon: '🔥', top: '38%', left: '44%', width: '12%', height: '8%' },
-    { id: 'genitales', name: 'Zona íntima', description: 'Intimidad, placer', icon: '🌸', top: '45%', left: '47%', width: '6%', height: '5%' },
-    { id: 'muslo_izq', name: 'Muslo Izq.', description: 'Fuerza, movimiento', icon: '🦵', top: '50%', left: '42%', width: '7%', height: '12%' },
-    { id: 'muslo_der', name: 'Muslo Der.', description: 'Fuerza, movimiento', icon: '🦵', top: '50%', left: '51%', width: '7%', height: '12%' },
-    { id: 'rodillas', name: 'Rodillas', description: 'Flexibilidad, humildad', icon: '🔄', top: '62%', left: '43%', width: '14%', height: '5%' },
-    { id: 'pierna_izq', name: 'Pierna Izq.', description: 'Avance, dirección', icon: '🚶', top: '67%', left: '42%', width: '6%', height: '15%' },
-    { id: 'pierna_der', name: 'Pierna Der.', description: 'Avance, dirección', icon: '🚶', top: '67%', left: '52%', width: '6%', height: '15%' },
-    { id: 'pies', name: 'Pies', description: 'Camino, conexión con la tierra', icon: '👣', top: '82%', left: '41%', width: '18%', height: '6%' }
-  ]
-
-  // Mapa de siluetas según género
-  const silhouettes = {
-    femenino: siluetaFemenina,
-    masculino: siluetaMasculina,
-    neutral: siluetaNeutral
-  }
-
-  // Pasos del proceso
-  const steps = [
-    { id: 0, title: 'Introducción', icon: '📖' },
-    { id: 1, title: 'Selección de Silueta', icon: '👤' },
-    { id: 2, title: 'Mapeo Emocional', icon: '🎨' },
-    { id: 3, title: 'Reflexiones', icon: '💭' },
-    { id: 4, title: 'Resultados', icon: '✨' }
-  ]
-
-  // Cargar datos guardados
-  useEffect(() => {
-    const saved = localStorage.getItem('modulo1_cartografia')
-    if (saved) {
-      setSavedData(JSON.parse(saved))
+    // Mapa de siluetas
+    const silhouettes = {
+      femenino: siluetaFemenina,
+      masculino: siluetaMasculina
+     
     }
-    setTimeout(() => setShowTooltip(false), 5000)
-  }, [])
 
-  // Calcular progreso
-  useEffect(() => {
-    const totalFields = Object.keys(emotions).length + Object.values(reflections).filter(r => r).length
-    const maxFields = bodyZones.length + Object.keys(reflections).length
-    setProgress((totalFields / maxFields) * 100)
-  }, [emotions, reflections])
+    // Matriz de preguntas según el documento
+    const questions = [
+      // SEXUALIDAD - Morado
+      {
+        id: 'sex1',
+        component: 'sexualidad',
+        color: '#9B59B6',
+        text: '¿Te hablaron de sexualidad? ¿quién o a qué edad?',
+        instruction: 'Ubica esta respuesta alrededor de la cabeza',
+        type: 'text',
+        bodyPart: 'cabeza'
+      },
+      {
+        id: 'sex2',
+        component: 'sexualidad',
+        color: '#9B59B6',
+        text: '¿A qué edad fue tu menarquía? / ¿a qué edad escuchaste sobre la menstruación?',
+        instruction: 'Ubica esta respuesta en el bajo vientre',
+        type: 'text',
+        bodyPart: 'vientre'
+      },
+      {
+        id: 'sex3',
+        component: 'sexualidad',
+        color: '#9B59B6',
+        text: '¿Qué historia te contaron frente a la gestación y la reproducción?',
+        instruction: 'Resume la historia frente al estómago',
+        type: 'text',
+        bodyPart: 'estomago'
+      },
+      // IDENTIDAD - Amarillo
+      {
+        id: 'ident1',
+        component: 'identidad',
+        color: '#F39C12',
+        text: '¿Cuál es la parte de tu cuerpo que más te gusta y cuál es la que menos?',
+        instruction: 'Señala con ❤️ lo que más te gusta y con ❌ lo que menos',
+        type: 'body-double',
+        bodyPart: null
+      },
+      {
+        id: 'ident2',
+        component: 'identidad',
+        color: '#F39C12',
+        text: '¿Cuál es la parte de tu cuerpo que menos conoces o con la que menos te relacionas?',
+        instruction: 'Señala con un signo de interrogación',
+        type: 'body-single',
+        marker: '❓',
+        bodyPart: null
+      },
+      // GÉNERO - Naranja
+      {
+        id: 'gen1',
+        component: 'genero',
+        color: '#E67E22',
+        text: '¿Cómo te vestías y peinabas cuando eras adolescente? (12-16 años)',
+        instruction: 'Dibuja o describe alrededor de la figura',
+        type: 'text',
+        bodyPart: 'general'
+      },
+      {
+        id: 'gen2',
+        component: 'genero',
+        color: '#E67E22',
+        text: 'En tu infancia ¿qué cosas eran de niñas y qué cosas eran de niños?',
+        instruction: 'Escribe a los lados de la silueta',
+        type: 'text-split',
+        bodyPart: 'lados'
+      },
+      // PLACER - Verde
+      {
+        id: 'plac1',
+        component: 'placer',
+        color: '#27AE60',
+        text: '¿Qué parte de tu cuerpo usas para realizar tu actividad favorita?',
+        instruction: 'Señálala con una estrella',
+        type: 'body-single',
+        marker: '⭐',
+        bodyPart: null
+      },
+      {
+        id: 'plac2',
+        component: 'placer',
+        color: '#27AE60',
+        text: '¿En qué partes de tu cuerpo sientes placer?',
+        instruction: 'Señala con asteriscos',
+        type: 'body-multiple',
+        marker: '✨',
+        bodyPart: null
+      },
+      {
+        id: 'plac3',
+        component: 'placer',
+        color: '#27AE60',
+        text: '¿Qué parte de tu cuerpo consideras es la más erótica y cuál la más erógena?',
+        instruction: 'Marca erótica con 🔥 y erógena con 💫',
+        type: 'body-double-custom',
+        markers: { erotica: '🔥', erogena: '💫' },
+        bodyPart: null
+      },
+      {
+        id: 'plac4',
+        component: 'placer',
+        color: '#27AE60',
+        text: '¿A qué edad sentiste atracción erótica afectiva por otra persona?',
+        instruction: 'Ubica en el corazón la respuesta',
+        type: 'text',
+        bodyPart: 'corazon'
+      },
+      {
+        id: 'plac5',
+        component: 'placer',
+        color: '#27AE60',
+        text: '¿Qué sientes y en dónde, cuando te enamoras?',
+        instruction: 'Señala con una mariposa',
+        type: 'body-text',
+        marker: '🦋',
+        bodyPart: null
+      },
+      // LÍMITES - Azul
+      {
+        id: 'lim1',
+        component: 'limites',
+        color: '#3498DB',
+        text: 'En tu infancia, ¿cómo te enseñaron que era la forma correcta de un saludo?',
+        instruction: 'Escribe en la parte inferior y señala si hay anécdota',
+        type: 'text',
+        bodyPart: 'inferior'
+      }
+    ]
 
-  // Guardar cartografía
-  const saveCartografia = () => {
-    const data = {
-      gender: selectedGender,
-      emotions,
-      reflections,
-      date: new Date().toISOString()
+    // Zonas clickeables del cuerpo
+    const bodyZones = [
+      { id: 'cabeza', name: 'Cabeza', x: '45%', y: '8%', width: '10%', height: '10%' },
+      { id: 'ojos', name: 'Ojos', x: '45%', y: '10%', width: '10%', height: '3%' },
+      { id: 'boca', name: 'Boca', x: '47%', y: '13%', width: '6%', height: '2%' },
+      { id: 'cuello', name: 'Cuello', x: '47%', y: '15%', width: '6%', height: '4%' },
+      { id: 'hombros', name: 'Hombros', x: '35%', y: '19%', width: '30%', height: '5%' },
+      { id: 'brazos', name: 'Brazos', x: '25%', y: '24%', width: '50%', height: '15%' },
+      { id: 'manos', name: 'Manos', x: '20%', y: '38%', width: '60%', height: '6%' },
+      { id: 'pecho', name: 'Pecho', x: '40%', y: '24%', width: '20%', height: '8%' },
+      { id: 'corazon', name: 'Corazón', x: '43%', y: '26%', width: '7%', height: '6%' },
+      { id: 'estomago', name: 'Estómago', x: '42%', y: '32%', width: '16%', height: '8%' },
+      { id: 'vientre', name: 'Vientre', x: '42%', y: '40%', width: '16%', height: '8%' },
+      { id: 'caderas', name: 'Caderas', x: '37%', y: '45%', width: '26%', height: '8%' },
+      { id: 'genitales', name: 'Zona íntima', x: '45%', y: '48%', width: '10%', height: '6%' },
+      { id: 'muslos', name: 'Muslos', x: '38%', y: '54%', width: '24%', height: '15%' },
+      { id: 'rodillas', name: 'Rodillas', x: '40%', y: '68%', width: '20%', height: '5%' },
+      { id: 'piernas', name: 'Piernas', x: '38%', y: '73%', width: '24%', height: '15%' },
+      { id: 'pies', name: 'Pies', x: '37%', y: '88%', width: '26%', height: '8%' }
+    ]
+
+    // Obtener pregunta actual
+    const currentQuestion = questions[currentQuestionIndex]
+
+    // Manejar cambio de texto sin perder foco
+    const handleTextChange = (value, questionId) => {
+      setResponses(prev => ({
+        ...prev,
+        [questionId]: value
+      }))
     }
-    localStorage.setItem('modulo1_cartografia', JSON.stringify(data))
-    setShowResults(true)
-    setActiveStep(4)
-  }
 
-  // Asignar emoción a zona
-  const assignEmotion = (zoneId, emotionId) => {
-    setEmotions({
-      ...emotions,
-      [zoneId]: emotionId
+    
+   /// Manejar selección de parte del cuerpo
+const handleBodyPartClick = (zoneId) => {
+  if (!currentQuestion) return
+
+  if (currentQuestion.type === 'body-single') {
+    setBodySelections(prev => ({
+      ...prev,
+      [currentQuestion.id]: { zone: zoneId, marker: currentQuestion.marker }
+    }))
+
+  } else if (currentQuestion.type === 'body-double') {
+    setBodySelections(prev => {
+      const current = prev[currentQuestion.id] || {}
+      if (!current.gusto) {
+        return {
+          ...prev,
+          [currentQuestion.id]: { ...current, gusto: zoneId }
+        }
+      } else if (!current.noGusto && zoneId !== current.gusto) {
+        return {
+          ...prev,
+          [currentQuestion.id]: { ...current, noGusto: zoneId }
+        }
+      }
+      return prev
     })
+
+  } else if (currentQuestion.type === 'body-double-custom') {
+    // CASO PARA ERÓTICA/ERÓGENA
+    setBodySelections(prev => {
+      const current = prev[currentQuestion.id] || {}
+      if (!current.erotica) {
+        return {
+          ...prev,
+          [currentQuestion.id]: { ...current, erotica: zoneId }
+        }
+      } else if (!current.erogena && zoneId !== current.erotica) {
+        return {
+          ...prev,
+          [currentQuestion.id]: { ...current, erogena: zoneId }
+        }
+      }
+      return prev
+    })
+
+  } else if (currentQuestion.type === 'body-multiple') {
+    setBodySelections(prev => {
+      const current = prev[currentQuestion.id] || []
+      if (current.includes(zoneId)) {
+        return {
+          ...prev,
+          [currentQuestion.id]: current.filter(id => id !== zoneId)
+        }
+      }
+      return {
+        ...prev,
+        [currentQuestion.id]: [...current, zoneId]
+      }
+    })
+
+  } else if (currentQuestion.type === 'body-text') {
+    // CASO PARA PREGUNTAS CON TEXTO Y MARCADOR
+    setBodySelections(prev => ({
+      ...prev,
+      [currentQuestion.id]: { zone: zoneId, marker: currentQuestion.marker }
+    }))
   }
+}
 
-  // Componente de Silueta Interactiva CORREGIDO
-const InteractiveSilhouette = () => (
-  <div className="silhouette-container">
-    <div className="silhouette-main-content">
-      {/* COLUMNA IZQUIERDA: Lista de zonas */}
-      <div className="zones-sidebar">
-        <h3>Zonas del cuerpo:</h3>
-        <div className="zones-list">
-          {bodyZones.map(zone => (
-            <button
-              key={zone.id}
-              className={`zone-label ${selectedZone === zone.id ? 'active' : ''} ${emotions[zone.id] ? 'filled' : ''}`}
-              onClick={() => setSelectedZone(zone.id)}
-            >
-              <span className="zone-icon">{zone.icon}</span>
-              <span className="zone-name">{zone.name}</span>
-              {emotions[zone.id] && (
-                <span
-                  className="zone-emotion-dot"
-                  style={{
-                    backgroundColor: emotionalColors.find(e => e.id === emotions[zone.id])?.color
-                  }}
-                />
-              )}
-            </button>
-          ))}
-        </div>
-      </div>
+    // Navegación
+    const goToNextQuestion = () => {
+      if (currentQuestionIndex < questions.length - 1) {
+        setCurrentQuestionIndex(currentQuestionIndex + 1)
+      } else {
+        setShowResults(true)
+        setCurrentStep('results')
+      }
+    }
 
-      {/* COLUMNA CENTRAL: Silueta */}
-      <div className="body-image-wrapper">
-        <img
-          src={silhouettes[selectedGender]}
-          alt={`Silueta ${selectedGender}`}
-          className="body-silhouette-image"
-        />
-      </div>
+    const goToPreviousQuestion = () => {
+      if (currentQuestionIndex > 0) {
+        setCurrentQuestionIndex(currentQuestionIndex - 1)
+      }
+    }
 
-      {/* COLUMNA DERECHA: Panel de emociones */}
-      <div className="emotion-sidebar">
-        {selectedZone ? (
-          <>
-            <h3>Asignar emoción a: {bodyZones.find(z => z.id === selectedZone)?.name}</h3>
-            <p className="zone-description">
-              {bodyZones.find(z => z.id === selectedZone)?.description}
-            </p>
-            <div className="emotion-list">
-              {emotionalColors.map(emotion => (
-                <button
-                  key={emotion.id}
-                  className={`emotion-button ${emotions[selectedZone] === emotion.id ? 'selected' : ''}`}
-                  onClick={() => assignEmotion(selectedZone, emotion.id)}
-                >
-                  <div
-                    className="emotion-color-badge"
-                    style={{ backgroundColor: emotion.color }}
-                  />
-                  <div className="emotion-info">
-                    <span className="emotion-name">{emotion.name}</span>
-                    <span className="emotion-description">{emotion.description}</span>
-                  </div>
-                </button>
-              ))}
-            </div>
-          </>
-        ) : (
-          <div className="emotion-placeholder">
-            <p>👈 Selecciona una zona del cuerpo para asignarle una emoción</p>
-          </div>
-        )}
-      </div>
-    </div>
-  </div>
-)
+    // Calcular progreso
+    const progress = ((currentQuestionIndex + 1) / questions.length) * 100
 
-  // Renderizado principal
-  return (
-    <div className="modulo1-container">
-      {/* Header del módulo */}
-      <header className="module-header">
-        <div className="header-content">
-          <button className="back-button" onClick={() => navigate('/home')}>
-            ← Volver
-          </button>
-          <div className="module-title-section">
-            <span className="module-icon">🎨</span>
-            <div>
-              <h1>Módulo 1: Cartografía Corporal</h1>
-              <p>Emocionalidad y autoconocimiento</p>
-            </div>
-          </div>
-          <div className="progress-indicator">
-            <span>{Math.round(progress)}%</span>
-            <div className="progress-bar">
-              <div className="progress-fill" style={{ width: `${progress}%` }}></div>
-            </div>
-          </div>
-        </div>
-      </header>
+    // Guardar cartografía
+    const saveCartography = () => {
+      const data = {
+        gender: selectedGender,
+        responses,
+        bodySelections,
+        date: new Date().toISOString()
+      }
+      localStorage.setItem('cartografia_corporal', JSON.stringify(data))
+      alert('Cartografía guardada exitosamente')
+    }
 
-      {/* Navegación por pasos */}
-      <div className="steps-navigation">
-        {steps.map(step => (
-          <button
-            key={step.id}
-            className={`step-button ${activeStep === step.id ? 'active' : ''} ${activeStep > step.id ? 'completed' : ''}`}
-            onClick={() => setActiveStep(step.id)}
-          >
-            <span className="step-icon">{step.icon}</span>
-            <span className="step-title">{step.title}</span>
-          </button>
-        ))}
-      </div>
-
-      {/* Contenido del paso activo */}
-      <div className="module-content">
-        {/* Paso 0: Introducción */}
-        {activeStep === 0 && (
-          <div className="step-content introduction">
+    // Renderizar según el paso actual
+    if (currentStep === 'intro') {
+      return (
+        <div className="modulo-container">
+          <div className="intro-screen">
             <div className="intro-card">
-              <h2>Bienvenid@ a tu Cartografía Corporal</h2>
-              <p className="intro-text">
-                Este ejercicio te ayudará a explorar la relación con tu cuerpo, identificar emociones
-                y reflexionar sobre tu sexualidad de manera integral y respetuosa.
-              </p>
+              <h1>🎨 Cartografía Corporal</h1>
+              <h2>Módulo de Autoconocimiento y Sexualidad</h2>
+              <p>Este ejercicio te guiará a través de una exploración personal sobre tu cuerpo,
+                tu historia y tu sexualidad de manera integral y respetuosa.</p>
 
-              <div className="intro-features">
-                <div className="feature">
-                  <span className="feature-icon">🎨</span>
-                  <h4>Mapeo Emocional</h4>
-                  <p>Asocia colores y emociones a diferentes partes de tu cuerpo</p>
+              <div className="components-preview">
+                <div className="component-item" style={{backgroundColor: '#9B59B6'}}>
+                  <span>Sexualidad</span>
+                  <small>Educación y conceptos aprendidos</small>
                 </div>
-                <div className="feature">
-                  <span className="feature-icon">💭</span>
-                  <h4>Reflexión Guiada</h4>
-                  <p>Preguntas que te ayudarán a profundizar en tu autoconocimiento</p>
+                <div className="component-item" style={{backgroundColor: '#F39C12'}}>
+                  <span>Identidad</span>
+                  <small>Relación con tu cuerpo</small>
                 </div>
-                <div className="feature">
-                  <span className="feature-icon">🔒</span>
-                  <h4>Espacio Seguro</h4>
-                  <p>Tus respuestas son privadas y se guardan solo en tu dispositivo</p>
+                <div className="component-item" style={{backgroundColor: '#E67E22'}}>
+                  <span>Género</span>
+                  <small>Expresión y orientación</small>
+                </div>
+                <div className="component-item" style={{backgroundColor: '#27AE60'}}>
+                  <span>Placer</span>
+                  <small>Sensaciones y afectos</small>
+                </div>
+                <div className="component-item" style={{backgroundColor: '#3498DB'}}>
+                  <span>Límites</span>
+                  <small>Respeto y consentimiento</small>
                 </div>
               </div>
 
-              {savedData && (
-                <div className="saved-data-notice">
-                  <span>💾 Tienes una cartografía guardada del {new Date(savedData.date).toLocaleDateString()}</span>
-                  <button onClick={() => {
-                    setEmotions(savedData.emotions)
-                    setReflections(savedData.reflections)
-                    setSelectedGender(savedData.gender)
-                  }}>
-                    Cargar
-                  </button>
-                </div>
-              )}
-
-              <button className="primary-button" onClick={() => setActiveStep(1)}>
-                Comenzar →
+              <button
+                className="btn-primary"
+                onClick={() => setCurrentStep('gender')}
+              >
+                Comenzar Ejercicio →
               </button>
             </div>
           </div>
-        )}
+        </div>
+      )
+    }
 
-        {/* Paso 1: Selección de silueta */}
-        {activeStep === 1 && (
-          <div className="step-content gender-selection">
-            <h2>Elige la silueta con la que te identifiques</h2>
-            <p>Puedes elegir la representación que mejor te represente</p>
+    if (currentStep === 'gender') {
+      return (
+        <div className="modulo-container">
+          <div className="gender-selection">
+            <h2>Selecciona la silueta con la que te identificas</h2>
+            <p>Esta elección es personal y puedes cambiarla si lo deseas</p>
 
             <div className="gender-options">
-              <button
-                className={`gender-option ${selectedGender === 'femenino' ? 'selected' : ''}`}
-                onClick={() => setSelectedGender('femenino')}
-              >
-                <div className="gender-preview">
-                  <img
-                    src={silhouettes.femenino}
-                    alt="Silueta femenina"
-                    className="gender-thumbnail"
-                  />
+              {Object.keys(silhouettes).map(gender => (
+                <div
+                  key={gender}
+                  className={`gender-card ${selectedGender === gender ? 'selected' : ''}`}
+                  onClick={() => setSelectedGender(gender)}
+                >
+                  <img src={silhouettes[gender]} alt={gender} />
+                  <span>{gender.charAt(0).toUpperCase() + gender.slice(1)}</span>
                 </div>
-                <span>Silueta Femenina</span>
-              </button>
-              <button
-                className={`gender-option ${selectedGender === 'masculino' ? 'selected' : ''}`}
-                onClick={() => setSelectedGender('masculino')}
+              ))}
+            </div>
+
+            <button
+              className="btn-primary"
+              onClick={() => setCurrentStep('questions')}
+            >
+              Continuar →
+            </button>
+          </div>
+        </div>
+      )
+    }
+
+    if (currentStep === 'questions') {
+      return (
+        <div className="modulo-container">
+          <header className="modulo-header">
+            <button onClick={() => navigate('/home')} className="btn-back">
+              ← Volver
+            </button>
+            <h1>Módulo 1: Cartografía Corporal</h1>
+            <span className="question-counter">
+              Pregunta {currentQuestionIndex + 1} de {questions.length}
+            </span>
+          </header>
+
+          {/* Barra de progreso con componentes */}
+          <div className="progress-bar-container">
+            {['sexualidad', 'identidad', 'genero', 'placer', 'limites'].map(comp => (
+              <div
+                key={comp}
+                className="progress-segment"
+                style={{
+                  backgroundColor: questions.find(q => q.component === comp)?.color,
+                  width: '20%',
+                  opacity: questions.filter(q => q.component === comp &&
+                    questions.indexOf(q) <= currentQuestionIndex).length > 0 ? 1 : 0.3
+                }}
+              />
+            ))}
+            <div
+              className="progress-fill"
+              style={{ width: `${progress}%` }}
+            />
+          </div>
+
+          <div className="main-content">
+            {/* Panel izquierdo - Pregunta actual */}
+            <div className="left-panel">
+              <div
+                className="question-card"
+                style={{ borderColor: currentQuestion.color }}
               >
-                <div className="gender-preview">
-                  <img
-                    src={silhouettes.masculino}
-                    alt="Silueta masculina"
-                    className="gender-thumbnail"
-                  />
+                <div
+                  className="question-header"
+                  style={{ backgroundColor: currentQuestion.color }}
+                >
+                  <span className="component-label">
+                    {currentQuestion.component.toUpperCase()}
+                  </span>
                 </div>
-                <span>Silueta Masculina</span>
-              </button>
-              <button
-                className={`gender-option ${selectedGender === 'neutral' ? 'selected' : ''}`}
-                onClick={() => setSelectedGender('neutral')}
-              >
-                <div className="gender-preview">
-                  <img
-                    src={silhouettes.neutral}
-                    alt="Silueta neutral"
-                    className="gender-thumbnail"
+
+                <h3>{currentQuestion.text}</h3>
+                <p className="instruction">📍 {currentQuestion.instruction}</p>
+
+                {/* Input según tipo de pregunta */}
+                {currentQuestion.type === 'text' && (
+                  <textarea
+                    ref={el => textAreaRefs.current[currentQuestion.id] = el}
+                    value={responses[currentQuestion.id] || ''}
+                    onChange={(e) => handleTextChange(e.target.value, currentQuestion.id)}
+                    placeholder="Escribe tu respuesta aquí..."
+                    rows="4"
+                    className="response-textarea"
                   />
-                </div>
-                <span>Silueta Neutral</span>
-              </button>
-            </div>
+                )}
+                {/* Input para preguntas body-text (cuerpo + texto) */}
+{currentQuestion.type === 'body-text' && (
+  <div className="body-text-input">
+    <textarea
+      ref={el => textAreaRefs.current[currentQuestion.id] = el}
+      value={responses[currentQuestion.id] || ''}
+      onChange={(e) => handleTextChange(e.target.value, currentQuestion.id)}
+      placeholder="Describe qué sientes cuando te enamoras..."
+      rows="3"
+      className="response-textarea"
+    />
+    <div className="selection-info">
+      <p>{currentQuestion.marker} Selecciona en qué parte del cuerpo lo sientes</p>
+      {bodySelections[currentQuestion.id] && (
+        <div className="selections-made">
+          {Array.isArray(bodySelections[currentQuestion.id]) ?
+            bodySelections[currentQuestion.id].map(zone => (
+              <span key={zone} className="selection-tag">
+                {currentQuestion.marker} {bodyZones.find(z => z.id === zone)?.name}
+              </span>
+            ))
+            :
+            <span className="selection-tag">
+              {currentQuestion.marker} {bodyZones.find(z => z.id === bodySelections[currentQuestion.id].zone)?.name}
+            </span>
+          }
+        </div>
+      )}
+    </div>
+  </div>
+)}
+                {/* Input para preguntas de tipo split (niñas/niños) */}
+{currentQuestion.type === 'text-split' && (
+  <div className="split-inputs">
+    <div className="split-input-group">
+      <label>👧 Cosas de niñas:</label>
+      <textarea
+        ref={el => textAreaRefs.current[`${currentQuestion.id}_girls`] = el}
+        value={responses[`${currentQuestion.id}_girls`] || ''}
+        onChange={(e) => handleTextChange(e.target.value, `${currentQuestion.id}_girls`)}
+        placeholder="Escribe qué consideraban de niñas..."
+        rows="3"
+        className="response-textarea"
+      />
+    </div>
+    <div className="split-input-group">
+      <label>👦 Cosas de niños:</label>
+      <textarea
+        ref={el => textAreaRefs.current[`${currentQuestion.id}_boys`] = el}
+        value={responses[`${currentQuestion.id}_boys`] || ''}
+        onChange={(e) => handleTextChange(e.target.value, `${currentQuestion.id}_boys`)}
+        placeholder="Escribe qué consideraban de niños..."
+        rows="3"
+        className="response-textarea"
+      />
+    </div>
+  </div>
+)}
 
-            <div className="navigation-buttons">
-              <button className="secondary-button" onClick={() => setActiveStep(0)}>
-                ← Anterior
-              </button>
-              <button className="primary-button" onClick={() => setActiveStep(2)}>
-                Siguiente →
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* Paso 2: Mapeo emocional */}
-        {activeStep === 2 && (
-          <div className="step-content mapping">
-            {showTooltip && (
-              <div className="tooltip-banner">
-                💡 Haz clic en las zonas del cuerpo o en los botones laterales para asignar emociones
-              </div>
-            )}
-            <InteractiveSilhouette />
-
-            <div className="navigation-buttons">
-              <button className="secondary-button" onClick={() => setActiveStep(1)}>
-                ← Anterior
-              </button>
-              <button
-                className="primary-button"
-                onClick={() => setActiveStep(3)}
-                disabled={Object.keys(emotions).length < 3}
-              >
-                Siguiente →
-              </button>
-            </div>
-
-            {Object.keys(emotions).length < 3 && (
-              <p className="hint-text">Asigna al menos 3 emociones para continuar</p>
-            )}
-          </div>
-        )}
-
-        {/* Paso 3: Reflexiones */}
-        {activeStep === 3 && (
-          <div className="step-content reflections">
-            <h2>Reflexiones sobre tu cartografía</h2>
-            <p>Tómate un momento para reflexionar sobre lo que has mapeado</p>
-
-            <div className="reflection-cards">
-              <div className="reflection-card">
-                <label>
-                  <span className="reflection-icon">💪</span>
-                  ¿Qué fortalezas identificaste en tu cuerpo?
-                </label>
-                <textarea
-                  placeholder="Describe las zonas donde sientes poder, confianza o alegría..."
-                  value={reflections.fortalezas}
-                  onChange={(e) => setReflections({...reflections, fortalezas: e.target.value})}
-                  rows="3"
-                />
-              </div>
-
-              <div className="reflection-card">
-                <label>
-                  <span className="reflection-icon">🛡️</span>
-                  ¿Qué límites son importantes para ti?
-                </label>
-                <textarea
-                  placeholder="¿Qué partes de tu cuerpo o emociones necesitan mayor cuidado y respeto?"
-                  value={reflections.limites}
-                  onChange={(e) => setReflections({...reflections, limites: e.target.value})}
-                  rows="3"
-                />
-              </div>
-
-              <div className="reflection-card">
-                <label>
-                  <span className="reflection-icon">❤️</span>
-                  ¿Qué te produce bienestar y placer?
-                </label>
-                <textarea
-                  placeholder="Identifica qué sensaciones o experiencias te generan satisfacción..."
-                  value={reflections.placeres}
-                  onChange={(e) => setReflections({...reflections, placeres: e.target.value})}
-                  rows="3"
-                />
-              </div>
-
-              <div className="reflection-card">
-                <label>
-                  <span className="reflection-icon">🌱</span>
-                  ¿Qué áreas identificas como vulnerables?
-                </label>
-                <textarea
-                  placeholder="¿Dónde sientes que necesitas mayor protección o comprensión?"
-                  value={reflections.vulnerabilidades}
-                  onChange={(e) => setReflections({...reflections, vulnerabilidades: e.target.value})}
-                  rows="3"
-                />
-              </div>
-
-              <div className="reflection-card">
-                <label>
-                  <span className="reflection-icon">🔮</span>
-                  ¿Qué miedos o preocupaciones surgieron?
-                </label>
-                <textarea
-                  placeholder="Es normal sentir temores. ¿Cuáles identificaste durante este ejercicio?"
-                  value={reflections.miedos}
-                  onChange={(e) => setReflections({...reflections, miedos: e.target.value})}
-                  rows="3"
-                />
-              </div>
-            </div>
-
-            <div className="navigation-buttons">
-              <button className="secondary-button" onClick={() => setActiveStep(2)}>
-                ← Anterior
-              </button>
-              <button
-                className="primary-button save-button"
-                onClick={saveCartografia}
-              >
-                Guardar y Ver Resultados →
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* Paso 4: Resultados */}
-        {(activeStep === 4 || showResults) && (
-          <div className="step-content results">
-            <div className="results-card">
-              <h2>✨ Tu Cartografía Personal</h2>
-              <p>Has completado exitosamente tu mapeo corporal-emocional</p>
-
-              <div className="results-summary">
-                <div className="summary-section">
-                  <h3>Emociones Mapeadas</h3>
-                  <div className="emotion-summary">
-                    {Object.entries(emotions).map(([zone, emotion]) => {
-                      const emotionData = emotionalColors.find(e => e.id === emotion)
-                      const zoneData = bodyZones.find(z => z.id === zone)
-                      return (
-                        <div key={zone} className="emotion-item">
-                          <span className="zone-name">{zoneData?.icon} {zoneData?.name}:</span>
-                          <span
-                            className="emotion-tag"
-                            style={{ backgroundColor: emotionData?.color }}
-                          >
-                            {emotionData?.name}
+                {currentQuestion.type === 'body-double-custom' && (
+  <div className="selection-info">
+    <p>Selecciona las partes del cuerpo:</p>
+    <div className="selections-made">
+      {bodySelections[currentQuestion.id]?.erotica && (
+        <span className="selection-tag orange">
+          🔥 Más erótica: {bodyZones.find(z => z.id === bodySelections[currentQuestion.id].erotica)?.name}
+        </span>
+      )}
+      {bodySelections[currentQuestion.id]?.erogena && (
+        <span className="selection-tag purple">
+          💫 Más erógena: {bodyZones.find(z => z.id === bodySelections[currentQuestion.id].erogena)?.name}
+        </span>
+      )}
+    </div>
+    <small className="help-text">
+      🔥 Primero selecciona la parte más erótica<br/>
+      💫 Luego selecciona la parte más erógena
+    </small>
+  </div>
+)}
+                {(currentQuestion.type === 'body-single' || currentQuestion.type === 'body-multiple') && (
+                  <div className="selection-info">
+                    <p>{currentQuestion.marker} Haz clic en la silueta para marcar</p>
+                    {bodySelections[currentQuestion.id] && (
+                      <div className="selections-made">
+                        {Array.isArray(bodySelections[currentQuestion.id]) ?
+                          bodySelections[currentQuestion.id].map(zone => (
+                            <span key={zone} className="selection-tag">
+                              {currentQuestion.marker} {bodyZones.find(z => z.id === zone)?.name}
+                            </span>
+                          ))
+                          :
+                          <span className="selection-tag">
+                            {currentQuestion.marker} {bodyZones.find(z => z.id === bodySelections[currentQuestion.id].zone)?.name}
                           </span>
-                        </div>
-                      )
-                    })}
-                  </div>
-                </div>
-
-                <div className="summary-section">
-                  <h3>Reflexiones Clave</h3>
-                  <div className="reflections-summary">
-                    {Object.entries(reflections).filter(([_, value]) => value).map(([key, value]) => (
-                      <div key={key} className="reflection-item">
-                        <strong>{key.charAt(0).toUpperCase() + key.slice(1)}:</strong>
-                        <p>{value.substring(0, 100)}...</p>
+                        }
                       </div>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              <div className="navigation-buttons">
+                <button
+                  onClick={goToPreviousQuestion}
+                  disabled={currentQuestionIndex === 0}
+                  className="btn-secondary"
+                >
+                  ← Anterior
+                </button>
+                <button
+                  onClick={goToNextQuestion}
+                  className="btn-primary"
+                >
+                  {currentQuestionIndex === questions.length - 1 ? 'Finalizar' : 'Siguiente →'}
+                </button>
+              </div>
+            </div>
+
+            {/* Panel central - Silueta interactiva */}
+            <div className="center-panel">
+              <div className="silhouette-container">
+                <img
+                  src={silhouettes[selectedGender]}
+                  alt="Silueta corporal"
+                  className="body-silhouette"
+                />
+
+                {/* Zonas clickeables superpuestas */}
+                {bodyZones.map(zone => (
+                  <div
+                    key={zone.id}
+                    className={`body-zone ${
+                      bodySelections[currentQuestion?.id]?.gusto === zone.id ? 'selected-green' :
+                      bodySelections[currentQuestion?.id]?.noGusto === zone.id ? 'selected-red' :
+                      bodySelections[currentQuestion?.id]?.zone === zone.id ? 'selected' :
+                      Array.isArray(bodySelections[currentQuestion?.id]) &&
+                      bodySelections[currentQuestion?.id].includes(zone.id) ? 'selected' : ''
+                    }`}
+                    style={{
+                      left: zone.x,
+                      top: zone.y,
+                      width: zone.width,
+                      height: zone.height
+                    }}
+                    onClick={() => handleBodyPartClick(zone.id)}
+                    title={zone.name}
+                  >
+                    {bodySelections[currentQuestion?.id]?.gusto === zone.id && '❤️'}
+                    {bodySelections[currentQuestion?.id]?.noGusto === zone.id && '❌'}
+                    {bodySelections[currentQuestion?.id]?.erotica === zone.id && '🔥'}
+{bodySelections[currentQuestion?.id]?.erogena === zone.id && '💫'}
+                    {bodySelections[currentQuestion?.id]?.zone === zone.id && currentQuestion?.marker}
+                    {Array.isArray(bodySelections[currentQuestion?.id]) &&
+                    bodySelections[currentQuestion?.id].includes(zone.id) && currentQuestion?.marker}
+                  </div>
+                ))}
+              </div>
+
+              {/* Lista de zonas para selección */}
+              {(currentQuestion?.type?.includes('body')) && (
+                <div className="zones-list">
+                  <p>Selecciona las zonas:</p>
+                  <div className="zones-grid">
+                    {bodyZones.map(zone => (
+                      <button
+                        key={zone.id}
+                        className={`zone-btn ${
+                          bodySelections[currentQuestion.id]?.gusto === zone.id ? 'selected-green' :
+                          bodySelections[currentQuestion.id]?.noGusto === zone.id ? 'selected-red' :
+                          bodySelections[currentQuestion.id]?.zone === zone.id ? 'selected' :
+                          Array.isArray(bodySelections[currentQuestion.id]) &&
+                          bodySelections[currentQuestion.id].includes(zone.id) ? 'selected' : ''
+                        }`}
+                        onClick={() => handleBodyPartClick(zone.id)}
+                      >
+                        {zone.name}
+                        {bodySelections[currentQuestion.id]?.gusto === zone.id && ' ❤️'}
+                        {bodySelections[currentQuestion.id]?.noGusto === zone.id && ' ❌'}
+                        {bodySelections[currentQuestion.id]?.zone === zone.id && ` ${currentQuestion.marker}`}
+                        {Array.isArray(bodySelections[currentQuestion.id]) &&
+                        bodySelections[currentQuestion.id].includes(zone.id) && ` ${currentQuestion.marker}`}
+                      </button>
                     ))}
                   </div>
                 </div>
-              </div>
+              )}
+            </div>
 
-              <div className="results-actions">
-                <button className="secondary-button" onClick={() => window.print()}>
-                  📄 Imprimir
-                </button>
-                <button
-                  className="primary-button"
-                  onClick={() => navigate('/modulo2')}
-                >
-                  Continuar al Módulo 2 →
-                </button>
-              </div>
-
-              <div className="privacy-note">
-                <span>🔒</span>
-                <p>Tu cartografía se ha guardado de forma privada en tu dispositivo.
-                   Puedes consultarla cuando quieras desde este módulo.</p>
+            {/* Panel derecho - Respuestas registradas */}
+            <div className="right-panel">
+              <h3>📝 Respuestas registradas</h3>
+              <div className="responses-list">
+                {questions.slice(0, currentQuestionIndex + 1).map((q, idx) => (
+                  <div
+                    key={q.id}
+                    className="response-item"
+                    style={{ borderLeft: `3px solid ${q.color}` }}
+                  >
+                    <span className="response-number">#{idx + 1}</span>
+                    <small>{q.text.substring(0, 50)}...</small>
+                    {responses[q.id] && (
+                      <p className="response-preview">
+                        ✓ Respondida
+                      </p>
+                    )}
+                    {bodySelections[q.id] && (
+                      <p className="response-preview">
+                        ✓ Marcada en silueta
+                      </p>
+                    )}
+                  </div>
+                ))}
               </div>
             </div>
           </div>
-        )}
-      </div>
-
-      {/* Footer informativo */}
-      <footer className="module-footer">
-        <div className="footer-content">
-          <p>
-            <strong>Recuerda:</strong> Este es un espacio seguro para tu autoexploración.
-            No hay respuestas correctas o incorrectas, solo tu experiencia personal.
-          </p>
         </div>
-      </footer>
+      )
+    }
+
+    if (currentStep === 'results') {
+  return (
+    <div className="modulo-container">
+      <div className="results-screen">
+        <div className="results-header">
+          <h1>🎉 Tu Cartografía Personal Completada</h1>
+          <p>Has explorado todas las dimensiones de tu corporalidad y sexualidad</p>
+        </div>
+
+        <div className="results-summary">
+          {['sexualidad', 'identidad', 'genero', 'placer', 'limites'].map(comp => {
+            const compQuestions = questions.filter(q => q.component === comp)
+
+            return (
+              <div
+                key={comp}
+                className="component-summary"
+                style={{ borderColor: compQuestions[0]?.color }}
+              >
+                <div
+                  className="component-header"
+                  style={{ backgroundColor: compQuestions[0]?.color }}
+                >
+                  <h3>{comp.toUpperCase()}</h3>
+                </div>
+                <div className="component-body">
+                  {compQuestions.map(q => (
+                    <div key={q.id} className="summary-item">
+                      <p className="question-text">{q.text}</p>
+
+                      {/* Respuestas de texto normal */}
+                      {q.type === 'text' && responses[q.id] && (
+                        <p className="response-text">
+                          ✓ Respondida: {responses[q.id].substring(0, 100)}...
+                        </p>
+                      )}
+
+                      {/* Respuestas split (niñas/niños) */}
+                      {q.type === 'text-split' && (
+                        <>
+                          {responses[`${q.id}_girls`] && (
+                            <p className="response-text">
+                              👧 Niñas: {responses[`${q.id}_girls`].substring(0, 50)}...
+                            </p>
+                          )}
+                          {responses[`${q.id}_boys`] && (
+                            <p className="response-text">
+                              👦 Niños: {responses[`${q.id}_boys`].substring(0, 50)}...
+                            </p>
+                          )}
+                        </>
+                      )}
+
+                      {/* Selección simple de cuerpo */}
+                      {q.type === 'body-single' && bodySelections[q.id] && (
+                        <p className="response-text">
+                          ✓ {q.marker} Marcado: {bodyZones.find(z => z.id === bodySelections[q.id].zone)?.name}
+                        </p>
+                      )}
+
+                      {/* Selección doble (gusto/no gusto) */}
+                      {q.type === 'body-double' && bodySelections[q.id] && (
+                        <>
+                          {bodySelections[q.id].gusto && (
+                            <p className="response-text">
+                              ❤️ Lo que más gusta: {bodyZones.find(z => z.id === bodySelections[q.id].gusto)?.name}
+                            </p>
+                          )}
+                          {bodySelections[q.id].noGusto && (
+                            <p className="response-text">
+                              ❌ Lo que menos gusta: {bodyZones.find(z => z.id === bodySelections[q.id].noGusto)?.name}
+                            </p>
+                          )}
+                        </>
+                      )}
+
+                      {/* Selección múltiple */}
+                      {q.type === 'body-multiple' && bodySelections[q.id] && (
+                        <p className="response-text">
+                          ✓ {q.marker} Zonas marcadas: {
+                            bodySelections[q.id].map(zoneId =>
+                              bodyZones.find(z => z.id === zoneId)?.name
+                            ).filter(Boolean).join(', ')
+                          }
+                        </p>
+                      )}
+
+                      {/* Selección erótica/erógena */}
+                      {q.type === 'body-double-custom' && bodySelections[q.id] && (
+                        <>
+                          {bodySelections[q.id].erotica && (
+                            <p className="response-text">
+                              🔥 Más erótica: {bodyZones.find(z => z.id === bodySelections[q.id].erotica)?.name}
+                            </p>
+                          )}
+                          {bodySelections[q.id].erogena && (
+                            <p className="response-text">
+                              💫 Más erógena: {bodyZones.find(z => z.id === bodySelections[q.id].erogena)?.name}
+                            </p>
+                          )}
+                        </>
+                      )}
+
+                      {/* Cuerpo con texto */}
+                      {q.type === 'body-text' && (
+                        <>
+                          {bodySelections[q.id] && (
+                            <p className="response-text">
+                              ✓ {q.marker} Zona: {bodyZones.find(z => z.id === bodySelections[q.id])?.name}
+                            </p>
+                          )}
+                          {responses[q.id] && (
+                            <p className="response-text">
+                              💭 {responses[q.id].substring(0, 100)}...
+                            </p>
+                          )}
+                        </>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )
+          })}
+        </div>
+
+        <div className="results-actions">
+          <button onClick={saveCartography} className="btn-primary">
+            💾 Guardar Cartografía
+          </button>
+          <button onClick={() => window.print()} className="btn-secondary">
+            🖨️ Imprimir
+          </button>
+          <button onClick={() => navigate('/modulo2')} className="btn-primary">
+            Continuar al Módulo 2 →
+          </button>
+        </div>
+      </div>
     </div>
   )
 }
 
-export default Modulo1
+
+    return null
+  }
+
+  export default Modulo1
