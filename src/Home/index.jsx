@@ -28,10 +28,10 @@ function Home() {
       icon: "📚"
     },
     {
-      id: 2,
-      title: "Módulo 2: Primera Infancia",
-      subtitle: "0 a 5 años",
-      icon: "👶"
+        id: 2,
+  title: "Módulo 2: Diversidad Familiar",
+  subtitle: "Entornos Protectores",
+  icon: "🏠"  // o mantén el 👶 si prefieres
     },
     {
       id: 3,

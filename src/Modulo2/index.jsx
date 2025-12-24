@@ -170,7 +170,7 @@ function Modulo2() {
           <div className="intro-card">
             <div className="intro-header">
               <span className="module-number">MÓDULO 2</span>
-              <h1>🏠 La Familia y sus Formas Diversas</h1>
+              <h1>La Familia y sus Formas Diversas</h1>
             </div>
 
             <div className="intro-content">
